@@ -44,7 +44,8 @@ public class CategoryService {
 		 * a exceção personalizada criada caso o 'obj' não traga valores 
 		 * na requisição. 
 		 * */		
-		Category entity=obj.orElseThrow(() -> new EntityNotFoundException("Entity not found"));
+		//Category entity=obj.orElseThrow(() -> new EntityNotFoundException("Entity not found"));
+		Category entity=obj.orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
 		
 		return new CategoryDTO(entity);
 	}

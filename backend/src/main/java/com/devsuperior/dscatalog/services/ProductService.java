@@ -1,8 +1,6 @@
 package com.devsuperior.dscatalog.services;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.persistence.EntityNotFoundException;
 
@@ -16,10 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.devsuperior.dscatalog.dto.ProductDTO;
 import com.devsuperior.dscatalog.entities.Product;
+import com.devsuperior.dscatalog.repositories.CategoryRepository;
 import com.devsuperior.dscatalog.repositories.ProductRepository;
 import com.devsuperior.dscatalog.services.exceptions.DatabaseException;
 import com.devsuperior.dscatalog.services.exceptions.ResourceNotFoundException;
-
 
 @Service
 public class ProductService {
@@ -28,7 +26,10 @@ public class ProductService {
 	@Autowired
 	private ProductRepository repository;
 
-	// o 'Transactional' define que o método ocorrerá em uma transação.	
+	@Autowired
+	private CategoryRepository categoryRepository;
+
+	// o 'Transactional' define que o método ocorrerá em uma transação.
 	@Transactional(readOnly = true)
 	public Page<ProductDTO> findAllPaged(PageRequest pageRequest) {
 		Page<Product> list = repository.findAll(pageRequest);
@@ -38,24 +39,24 @@ public class ProductService {
 
 	@Transactional(readOnly = true)
 	public ProductDTO findById(Long id) {
-		
+
 		/*
-		 * No lugar de um try/catch é usado o método 'orElseThrow' que lança
-		 * a exceção personalizada criada caso o 'obj' não traga valores 
-		 * na requisição. 
-		 * */
+		 * No lugar de um try/catch é usado o método 'orElseThrow' que lança a exceção
+		 * personalizada criada caso o 'obj' não traga valores na requisição.
+		 */
 		Optional<Product> obj = repository.findById(id);
-		Product entity=obj.orElseThrow(() -> new EntityNotFoundException("Entity not found"));
-		
+		//Product entity = obj.orElseThrow(() -> new EntityNotFoundException("Entity not found"));
+		Product entity = obj.orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
+
 		return new ProductDTO(entity, entity.getCategories());
 	}
 
 	@Transactional
 	public ProductDTO insert(ProductDTO dto) {
 		Product entity = new Product();
-		//entity.setName(dto.getName());
+		copyDtoToEntity(dto, entity);
 		entity = repository.save(entity);
-		
+
 		return new ProductDTO(entity);
 	}
 
@@ -63,26 +64,50 @@ public class ProductService {
 	public ProductDTO update(Long id, ProductDTO dto) {
 		try {
 			Product entity = repository.getOne(id);
-			//entity.setName(dto.getName());
-			entity = repository.save(entity);		
+			copyDtoToEntity(dto, entity);
+			entity = repository.save(entity);
 			return new ProductDTO(entity);
-			
+
 		} catch (EntityNotFoundException e) {
-			throw new ResourceNotFoundException("Id not found: "+id);
+			throw new ResourceNotFoundException("Id not found: " + id);
 		}
-		
+
 	}
-	
-	//Único sem Transactional, pois tem que capturar uma exceção e o transactional não deixaria
+
+	// Único sem Transactional, pois tem que capturar uma exceção e o transactional
+	// não deixaria
 	public void delete(Long id) {
 		try {
 			repository.deleteById(id);
 		} catch (EmptyResultDataAccessException e) {
-			throw new ResourceNotFoundException("Id not found: "+id);
+			throw new ResourceNotFoundException("Id not found: " + id);
 		} catch (DataIntegrityViolationException e) {
 			throw new DatabaseException("Integrity Violation!");
 		}
-		
+
+	}
+
+	private void copyDtoToEntity(ProductDTO dto, Product entity) {
+
+		entity.setName(dto.getName());
+		entity.setDescription(dto.getDescription());
+		entity.setDate(dto.getDate());
+		entity.setImgUrl(dto.getImgUrl());
+		entity.setPrice(dto.getPrice());
+
+		entity.getCategories().clear();
+
+		dto.getCategories().forEach(catDto -> {
+			//Category cat=categoryRepository.getOne(catDto.getId());
+			entity.getCategories().add(categoryRepository.getOne(catDto.getId()));
+		});
+//		
+//		Exemplo do professor com for para substituir linha 103 a 105
+//		for (CategoryDTO catDto : dto.getCategories()) {
+//			Category cat = categoryRepository.getOne(catDto.getId());
+//			entity.getCategories().add(cat);
+//		}
+
 	}
 
 }
