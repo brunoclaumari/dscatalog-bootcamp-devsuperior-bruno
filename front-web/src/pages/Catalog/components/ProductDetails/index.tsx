@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ReactComponent as ArrowIcon } from '../../../../core/assets/images/arrow.svg';
-import { ReactComponent as ProductImage } from '../../../../core/assets/images/product.svg';
 import './styles.scss';
 import '../../../../app.scss';
 import ProductPrice from '../../../../core/components/ProductPrice';
+import { makeRequest } from '../../../../core/utils/request';
+import { Product } from '../../../../core/types/Product';
 
 type ParamsType = {
     productId: string;
@@ -14,6 +15,15 @@ const ProductDetails = () => {
 
     const { productId } = useParams<ParamsType>();
     console.log(productId);
+    const [prod, setProd]=useState<Product>();
+    console.log(prod);
+
+    useEffect(() => {
+        console.log(`componente de detalhes iniciado ${productId}`);
+        
+        makeRequest({ url: `/products/${productId}` })
+            .then(response => setProd(response.data));
+    }, [productId]);
 
     return (
         <div className="product-details-container">
@@ -24,23 +34,20 @@ const ProductDetails = () => {
                 </Link>
                 <div className="row">
                     <div className="col-6 pr-5">
-                        <div className="product-details-card text-center">
-                            <ProductImage className="product-image" />
+                        <div className="product-details-card text-center">                           
+                            <img src={prod?.imgUrl} alt={prod?.name} className="product-image" />
                         </div>
                         <h1 className="product-details-name">
-                            Computador Desktop - Intel Core i7
+                            {prod?.name}
                         </h1>
-                        <ProductPrice price="3.779,00" />
+                        {prod?.price && <ProductPrice price={prod?.price} />}
                     </div>
                     <div className="col-6 pl-5 product-details-card">
                         <h6 className="product-description-title" >
                             Descrição do Produto
                         </h6>
                         <p className="product-description-text" >
-                            Seja um mestre em multitarefas com a capacidade para exibir quatro aplicativos simultâneos na tela.
-                            A tela está ficando abarrotada? Crie áreas de trabalho virtuais para obter mais espaço e
-                            trabalhar com os itens que você deseja. Além disso, todas as notificações e principais configurações
-                            são reunidas em uma única tela de fácil acesso.
+                            {prod?.description}
                         </p>
                     </div>
                 </div>
