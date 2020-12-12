@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { makeRequest } from '../../core/utils/request';
+import { makeRequest } from 'core/utils/request';
 import ProductCard from './components/ProductCard';
 import './styles.scss';
-import { ProductsResponse } from '../../core/types/Product';
+import { ProductsResponse } from 'core/types/Product';
+import ProductCardLoader from './components/Loaders/ProductCardLoader';
+
+
 
 const Catalog = () => {
 
     //quando a lista de produtos estiver disponivel,
     //popular um estado do componente, e listar os produtos dinamicamente
     const [productsResponse, setProductsResponse] = useState<ProductsResponse>();
+    const [isLoading, setIsLoading] = useState(false);
 
     console.log(productsResponse);
 
@@ -22,8 +26,14 @@ const Catalog = () => {
             linesPerPage: 12
         }
 
+        //iniciar o loader
+        setIsLoading(true);
         makeRequest({ url: '/products', params })
-            .then(response => setProductsResponse(response.data));
+            .then(response => setProductsResponse(response.data))
+            .finally(() => {
+                //finalizar o loader
+                setIsLoading(false);
+            });
     }, []);
 
     return (
@@ -32,12 +42,16 @@ const Catalog = () => {
                 Catálogo de produtos
             </h1>
             <div className="catalog-products" >
-                {productsResponse?.content.map(prod => (
-                    <Link to={`products/${prod.id}`} key={prod.id}>
-                        <ProductCard product={prod}/>
-                    </Link>
-                ))}
-
+                {
+                    //isso é um if ternario
+                    isLoading ? <ProductCardLoader /> : (
+                        productsResponse?.content.map(prod => (
+                            <Link to={`products/${prod.id}`} key={prod.id}>
+                                <ProductCard product={prod} />
+                            </Link>
+                        ))
+                    )
+                }
             </div>
         </div>
     )
@@ -55,3 +69,14 @@ export default Catalog;
 /* fetch(url)
 .then(resp => resp.json())
 .then(resp=>console.log(resp));  */
+
+//if ternario
+/*
+{isLoading ? <ProductCardLoader /> :
+                    productsResponse?.content.map(prod => (
+                        <Link to={`products/${prod.id}`} key={prod.id}>
+                            <ProductCard product={prod} />
+                        </Link>
+                    ))
+                }
+*/
