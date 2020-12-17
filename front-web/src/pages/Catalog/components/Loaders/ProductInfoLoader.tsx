@@ -9,9 +9,9 @@ const ProductInfoLoader = () => (
     backgroundColor="#ecebeb"
     foregroundColor="#d6d2d2"    
   >
-    <rect x="0" y="467" rx="2" ry="2" width="256" height="24" /> 
+    <rect x="0" y="488" rx="2" ry="2" width="256" height="24" /> 
     <rect x="0" y="21" rx="20" ry="20" width="100%" height="400" /> 
-    <rect x="0" y="423" rx="2" ry="2" width="351" height="24" />
+    <rect x="0" y="444" rx="2" ry="2" width="351" height="24" />
     {/* <rect x="0" y="467" rx="2" ry="2" width="256" height="24" /> 
     <rect x="0" y="0" rx="2" ry="2" width="1200" height="400" /> 
     <rect x="0" y="423" rx="2" ry="2" width="351" height="24" /> */}

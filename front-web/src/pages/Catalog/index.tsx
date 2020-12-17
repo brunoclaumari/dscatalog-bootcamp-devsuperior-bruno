@@ -5,6 +5,7 @@ import ProductCard from './components/ProductCard';
 import './styles.scss';
 import { ProductsResponse } from 'core/types/Product';
 import ProductCardLoader from './components/Loaders/ProductCardLoader';
+import Pagination from './components/Pagination';
 
 
 
@@ -14,6 +15,8 @@ const Catalog = () => {
     //popular um estado do componente, e listar os produtos dinamicamente
     const [productsResponse, setProductsResponse] = useState<ProductsResponse>();
     const [isLoading, setIsLoading] = useState(false);
+    const [activePage, setActivePage] = useState(0);
+    const [numPerPage, setNumPerpage] = useState(0);
 
     console.log(productsResponse);
 
@@ -22,9 +25,11 @@ const Catalog = () => {
         //no arquivo 'package.json' a porta no 'proxy' está setada para o 8080, 
         //onde está o backend, mas aqui no fetch é direcionado para a 3000   
         const params = {
-            page: 0,
+            page: activePage,
             linesPerPage: 12
+            
         }
+        setNumPerpage(params.linesPerPage);
 
         //iniciar o loader
         setIsLoading(true);
@@ -34,7 +39,7 @@ const Catalog = () => {
                 //finalizar o loader
                 setIsLoading(false);
             });
-    }, []);
+    }, [activePage]);
 
     return (
         <div className="catalog-container" >
@@ -44,7 +49,7 @@ const Catalog = () => {
             <div className="catalog-products" >
                 {
                     //isso é um if ternario
-                    isLoading ? <ProductCardLoader /> : (
+                    isLoading ? <ProductCardLoader nPerPage={numPerPage} /> : (
                         productsResponse?.content.map(prod => (
                             <Link to={`products/${prod.id}`} key={prod.id}>
                                 <ProductCard product={prod} />
@@ -53,6 +58,13 @@ const Catalog = () => {
                     )
                 }
             </div>
+            {productsResponse?.totalPages && 
+            <Pagination 
+            totalPages={productsResponse?.totalPages} 
+            activePage={activePage}
+            onChange={page => setActivePage(page)}
+            />}
+
         </div>
     )
 };

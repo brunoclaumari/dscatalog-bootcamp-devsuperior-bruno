@@ -2,9 +2,16 @@ import React from "react"
 import ContentLoader from "react-content-loader"
 import { generateList } from "core/utils/list";
 
-const ProductCardLoader = () => {
+type Props = {
+  nPerPage:number
+}
 
-  const loaderItems = generateList(6);
+const ProductCardLoader = ( {nPerPage}:Props ) => {
+
+  const loaderItems = generateList(5);
+  //atribuindo numero de itens de acordo com o 'linesPerPage'
+  //é mais automático
+  //const loaderItems = generateList(nPerPage);
 
   return (
     <>
