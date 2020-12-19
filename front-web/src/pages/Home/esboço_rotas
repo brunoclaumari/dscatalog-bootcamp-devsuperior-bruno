@@ -1,0 +1,27 @@
+/ -> Home
+
+/products
+/products/:productId
+
+/admin
+
+# CRUD de produtos
+/admin/products -> listagem de produtos
+/admin/products/create -> vai adicionar novo produto 
+/admin/products/:productId -> vai editar produto do 'id' passado
+
+# CRUD de categorias
+/admin/categories -> listagem de categorias
+/admin/categories/create -> vai adicionar nova categoria
+/admin/categories/:categoryId -> vai editar categoria do 'id' passado
+
+# CRUD de usuários
+/admin/users -> listagem de usuários
+/admin/users/create -> vai adicionar novo usuario
+/admin/users/:userId -> vai editar usuario do 'id' passado
+
+## autenticação
+/admin/auth/login
+/admin/auth/register
+/admin/auth/recover
+
