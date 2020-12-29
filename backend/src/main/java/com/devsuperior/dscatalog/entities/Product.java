@@ -26,10 +26,11 @@ public class Product implements Serializable {
 	private Long id;
 
 	private String name;
-	
+	//o columnDefinition como 'TEXT' aceita strings grandes no banco.
 	@Column(columnDefinition = "TEXT")
 	private String description;
 	private Double price;
+	@Column(columnDefinition = "TEXT")
 	private String imgUrl;
 
 	@Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
