@@ -32,6 +32,14 @@ public class UserUpdateValidator implements ConstraintValidator<UserUpdateValid,
 	@Override
 	public boolean isValid(UserUpdateDTO dto, ConstraintValidatorContext context) {
 		
+		/*O 'request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE' vai pegar um
+		 * mapa, dicionário, dos atributos enviados na URL. 
+		 * Nesse caso o resource vai pegar 'http://localhost:8080/clients/{id}'
+		 * e essa url terá o id como atributo.
+		 * Será útil para validar repetição de email e verificar se o id é o mesmo ou não 
+		 * pra não deixar repetir
+		 * */
+		
 		@SuppressWarnings("unchecked")
 		var uriVars = (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 		long userId = Long.parseLong(uriVars.get("id"));
