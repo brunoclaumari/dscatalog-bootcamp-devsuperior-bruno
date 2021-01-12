@@ -1,5 +1,7 @@
 package com.devsuperior.dscatalog.services;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityNotFoundException;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.devsuperior.dscatalog.dto.ProductDTO;
+import com.devsuperior.dscatalog.entities.Category;
 import com.devsuperior.dscatalog.entities.Product;
 import com.devsuperior.dscatalog.repositories.CategoryRepository;
 import com.devsuperior.dscatalog.repositories.ProductRepository;
@@ -31,8 +34,10 @@ public class ProductService {
 
 	// o 'Transactional' define que o método ocorrerá em uma transação.
 	@Transactional(readOnly = true)
-	public Page<ProductDTO> findAllPaged(PageRequest pageRequest) {
-		Page<Product> list = repository.findAll(pageRequest);
+	public Page<ProductDTO> findAllPaged(Long categoryId, String name, PageRequest pageRequest) {
+		List<Category> categories = (categoryId == 0) ? null : Arrays.asList(categoryRepository.getOne(categoryId));
+
+		Page<Product> list = repository.find(categories, name, pageRequest);
 		// Usando 'expressão lambda' para transferir Product para ProductDTO
 		return list.map(x -> new ProductDTO(x));
 	}
@@ -45,7 +50,8 @@ public class ProductService {
 		 * personalizada criada caso o 'obj' não traga valores na requisição.
 		 */
 		Optional<Product> obj = repository.findById(id);
-		//Product entity = obj.orElseThrow(() -> new EntityNotFoundException("Entity not found"));
+		// Product entity = obj.orElseThrow(() -> new EntityNotFoundException("Entity
+		// not found"));
 		Product entity = obj.orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
 
 		return new ProductDTO(entity, entity.getCategories());
@@ -98,7 +104,7 @@ public class ProductService {
 		entity.getCategories().clear();
 
 		dto.getCategories().forEach(catDto -> {
-			//Category cat=categoryRepository.getOne(catDto.getId());
+			// Category cat=categoryRepository.getOne(catDto.getId());
 			entity.getCategories().add(categoryRepository.getOne(catDto.getId()));
 		});
 //		
